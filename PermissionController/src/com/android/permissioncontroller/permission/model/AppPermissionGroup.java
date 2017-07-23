@@ -24,6 +24,7 @@ import static android.app.AppOpsManager.MODE_FOREGROUND;
 import static android.app.AppOpsManager.MODE_IGNORED;
 import static android.app.AppOpsManager.OPSTR_LEGACY_STORAGE;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+import static com.android.permissioncontroller.permission.utils.PermissionMapping.isSpecialRuntimePermission;
 
 import android.Manifest;
 import android.app.ActivityManager;
@@ -932,7 +933,7 @@ public final class AppPermissionGroup implements Comparable<AppPermissionGroup> 
 
             boolean wasGranted = permission.isGrantedIncludingAppOp();
 
-            if (mAppSupportsRuntimePermissions) {
+            if (mAppSupportsRuntimePermissions || isSpecialRuntimePermission(permission.getName())) {
                 // Do not touch permissions fixed by the system.
                 if (permission.isSystemFixed()) {
                     wasAllGranted = false;
@@ -1122,7 +1123,7 @@ public final class AppPermissionGroup implements Comparable<AppPermissionGroup> 
 
             boolean wasGranted = permission.isGrantedIncludingAppOp();
 
-            if (mAppSupportsRuntimePermissions) {
+            if (mAppSupportsRuntimePermissions || isSpecialRuntimePermission(permission.getName())) {
                 // Revoke the permission if needed.
                 if (permission.isGranted()) {
                     permission.setGranted(false);

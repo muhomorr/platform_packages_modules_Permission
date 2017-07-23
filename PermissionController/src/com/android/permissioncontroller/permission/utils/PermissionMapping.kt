@@ -49,6 +49,9 @@ object PermissionMapping {
     /** Mapping group -> permissions for all dangerous platform permissions */
     private val PLATFORM_PERMISSION_GROUPS: MutableMap<String, MutableList<String>> = mutableMapOf()
 
+    private val SPECIAL_RUNTIME_PERMISSIONS: MutableMap<String, String> = mutableMapOf()
+    private val SPECIAL_RUNTIME_PERMISSION_GROUPS: MutableMap<String, MutableList<String>> = mutableMapOf()
+
     /** Set of groups that will be able to receive one-time grant */
     private val ONE_TIME_PERMISSION_GROUPS: MutableSet<String> = mutableSetOf()
 
@@ -155,8 +158,20 @@ object PermissionMapping {
                 Manifest.permission_group.SENSORS
         }
 
+        PLATFORM_PERMISSIONS[Manifest.permission.INTERNET] = Manifest.permission_group.NETWORK
+        PLATFORM_PERMISSIONS[Manifest.permission.OTHER_SENSORS] = Manifest.permission_group.OTHER_SENSORS
+
+        SPECIAL_RUNTIME_PERMISSIONS[Manifest.permission.INTERNET] =
+            Manifest.permission_group.NETWORK
+        SPECIAL_RUNTIME_PERMISSIONS[Manifest.permission.OTHER_SENSORS] =
+            Manifest.permission_group.OTHER_SENSORS
+
         for ((permission, permissionGroup) in PLATFORM_PERMISSIONS) {
             PLATFORM_PERMISSION_GROUPS.getOrPut(permissionGroup) { mutableListOf() }.add(permission)
+        }
+
+        for ((permission, permissionGroup) in SPECIAL_RUNTIME_PERMISSIONS) {
+            SPECIAL_RUNTIME_PERMISSION_GROUPS.getOrPut(permissionGroup) { mutableListOf() }.add(permission)
         }
 
         ONE_TIME_PERMISSION_GROUPS.add(Manifest.permission_group.LOCATION)
@@ -273,5 +288,15 @@ object PermissionMapping {
     @JvmStatic
     fun supportsOneTimeGrant(permissionGroup: String?): Boolean {
         return ONE_TIME_PERMISSION_GROUPS.contains(permissionGroup)
+    }
+
+    @JvmStatic
+    fun isSpecialRuntimePermission(permission: String): Boolean {
+        return SPECIAL_RUNTIME_PERMISSIONS.containsKey(permission)
+    }
+
+    @JvmStatic
+    fun isSpecialRuntimePermissionGroup(permissionGroup: String): Boolean {
+        return SPECIAL_RUNTIME_PERMISSION_GROUPS.containsKey(permissionGroup)
     }
 }
