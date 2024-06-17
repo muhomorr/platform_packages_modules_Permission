@@ -483,7 +483,7 @@
     <string name="permgrouprequest_device_aware_coarselocation" msgid="9001956706241104626">"మీ &lt;b&gt;<xliff:g id="DEVICE">%2$s</xliff:g>&lt;/b&gt; రమారమి లొకేషన్‌ను యాక్సెస్ చేయడానికి &lt;b&gt;<xliff:g id="APP_NAME">%1$s</xliff:g>&lt;/b&gt;‌కు అనుమతినివ్వాలా?"</string>
     <string name="permgrouprequest_finelocation_imagetext" msgid="1313062433398914334">"ఖచ్చితమైన"</string>
     <string name="permgrouprequest_coarselocation_imagetext" msgid="8650605041483025297">"సుమారుగా"</string>
-    <string name="permgrouprequest_calendar" msgid="1493150855673603806">"మీ క్యాలెండర్‌ని యాక్సెస్ చేయడానికి &lt;b&gt;<xliff:g id="APP_NAME">%1$s</xliff:g>&lt;/b&gt;ని అనుమతించాలా?"</string>
+    <string name="permgrouprequest_calendar" msgid="1493150855673603806">"మీ క్యాలెండర్‌ను యాక్సెస్ చేయడానికి &lt;b&gt;<xliff:g id="APP_NAME">%1$s</xliff:g>&lt;/b&gt;‌ను అనుమతించాలా?"</string>
     <string name="permgrouprequest_device_aware_calendar" msgid="3103987548035171850">"మీ &lt;b&gt;<xliff:g id="DEVICE">%2$s</xliff:g>&lt;/b&gt;‌లో క్యాలెండర్‌ను యాక్సెస్ చేయడానికి &lt;b&gt;<xliff:g id="APP_NAME">%1$s</xliff:g>&lt;/b&gt;‌ను అనుమతించాలా?"</string>
     <string name="permgrouprequest_sms" msgid="5672063688745420991">"SMS మెసేజ్‌లు పంపడం, చూడటం చేయగలిగేలా &lt;b&gt;<xliff:g id="APP_NAME">%1$s</xliff:g>&lt;/b&gt;ను అనుమతించాలా?"</string>
     <string name="permgrouprequest_device_aware_sms" msgid="7212083972999874267">"మీ &lt;b&gt;<xliff:g id="DEVICE">%2$s</xliff:g>&lt;/b&gt;‌లో SMSను పంపడానికి, చూడటానికి &lt;b&gt;<xliff:g id="APP_NAME">%1$s</xliff:g>&lt;/b&gt;‌కు అనుమతినివ్వాలా?"</string>
