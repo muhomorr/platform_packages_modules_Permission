@@ -42,6 +42,7 @@ import android.util.Log;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
 import com.android.internal.util.Preconditions;
@@ -124,6 +125,7 @@ public class EnhancedConfirmationService extends SystemService {
             PROTECTED_SETTINGS.add(Manifest.permission.USE_SIP);
             PROTECTED_SETTINGS.add(Manifest.permission.ANSWER_PHONE_CALLS);
             PROTECTED_SETTINGS.add(Manifest.permission.ACCEPT_HANDOVER);
+            PROTECTED_SETTINGS.add(Manifest.permission_group.PHONE);
 
             PROTECTED_SETTINGS.add(Manifest.permission.SEND_SMS);
             PROTECTED_SETTINGS.add(Manifest.permission.RECEIVE_SMS);
@@ -131,21 +133,19 @@ public class EnhancedConfirmationService extends SystemService {
             PROTECTED_SETTINGS.add(Manifest.permission.RECEIVE_MMS);
             PROTECTED_SETTINGS.add(Manifest.permission.RECEIVE_WAP_PUSH);
             PROTECTED_SETTINGS.add(Manifest.permission.READ_CELL_BROADCASTS);
+            PROTECTED_SETTINGS.add(Manifest.permission_group.SMS);
+
+            PROTECTED_SETTINGS.add(Manifest.permission.BIND_DEVICE_ADMIN);
             // TODO(b/310654818): Add other explicitly protected runtime permissions
             // App ops
             PROTECTED_SETTINGS.add(AppOpsManager.OPSTR_BIND_ACCESSIBILITY_SERVICE);
             PROTECTED_SETTINGS.add(AppOpsManager.OPSTR_ACCESS_NOTIFICATIONS);
+            PROTECTED_SETTINGS.add(AppOpsManager.OPSTR_SYSTEM_ALERT_WINDOW);
+            PROTECTED_SETTINGS.add(AppOpsManager.OPSTR_GET_USAGE_STATS);
+            PROTECTED_SETTINGS.add(AppOpsManager.OPSTR_LOADER_USAGE_STATS);
             // Default application roles.
-            PROTECTED_SETTINGS.add(RoleManager.ROLE_ASSISTANT);
-            PROTECTED_SETTINGS.add(RoleManager.ROLE_BROWSER);
-            PROTECTED_SETTINGS.add(RoleManager.ROLE_CALL_REDIRECTION);
-            PROTECTED_SETTINGS.add(RoleManager.ROLE_CALL_SCREENING);
             PROTECTED_SETTINGS.add(RoleManager.ROLE_DIALER);
-            PROTECTED_SETTINGS.add(RoleManager.ROLE_HOME);
             PROTECTED_SETTINGS.add(RoleManager.ROLE_SMS);
-            PROTECTED_SETTINGS.add(RoleManager.ROLE_WALLET);
-            // Other settings
-            PROTECTED_SETTINGS.add(AppOpsManager.OPSTR_BIND_ACCESSIBILITY_SERVICE);
             // TODO(b/310654015): Add other explicitly protected settings
         }
 
@@ -197,6 +197,8 @@ public class EnhancedConfirmationService extends SystemService {
                     throw new IllegalStateException("Clear restriction attempted but not allowed");
                 }
                 setAppEcmState(packageName, EcmState.ECM_STATE_NOT_GUARDED, userId);
+                EnhancedConfirmationStatsLogUtils.INSTANCE.logRestrictionCleared(
+                        getPackageUid(packageName, userId));
             } catch (NameNotFoundException e) {
                 throw new IllegalArgumentException(e);
             }
@@ -245,9 +247,10 @@ public class EnhancedConfirmationService extends SystemService {
 
         private boolean isPackageEcmGuarded(@NonNull String packageName, @UserIdInt int userId)
                 throws NameNotFoundException {
+            ApplicationInfo applicationInfo = getApplicationInfoAsUser(packageName, userId);
             // Always trust allow-listed and pre-installed packages
             if (isAllowlistedPackage(packageName) || isAllowlistedInstaller(packageName)
-                    || isPackagePreinstalled(packageName, userId)) {
+                    || isPackagePreinstalled(applicationInfo)) {
                 return false;
             }
 
@@ -264,7 +267,9 @@ public class EnhancedConfirmationService extends SystemService {
             // Otherwise, lazily decide whether the app is considered guarded.
             InstallSourceInfo installSource;
             try {
-                installSource = mPackageManager.getInstallSourceInfo(packageName);
+                installSource = mContext.createContextAsUser(UserHandle.of(userId), 0)
+                        .getPackageManager()
+                        .getInstallSourceInfo(packageName);
             } catch (NameNotFoundException e) {
                 Log.w(LOG_TAG, "Package not found: " + packageName);
                 return false;
@@ -278,14 +283,24 @@ public class EnhancedConfirmationService extends SystemService {
                     || packageSource == PackageInstaller.PACKAGE_SOURCE_DOWNLOADED_FILE) {
                 return true;
             }
-
-            // If applicable, trust packages installed via non-allowlisted installers
-            if (trustPackagesInstalledViaNonAllowlistedInstallers()) return false;
+            String installingPackageName = installSource.getInstallingPackageName();
+            ApplicationInfo installingApplicationInfo =
+                    getApplicationInfoAsUser(installingPackageName, userId);
+            // TODO(b/330927429): We might need a long-term solution to persist the installer's
+            //  targetSdkVersion if it is uninstalled.
+            if (packageSource == PackageInstaller.PACKAGE_SOURCE_UNSPECIFIED
+                    && installingApplicationInfo != null
+                    && installingApplicationInfo.targetSdkVersion
+                    >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                        return true;
+            }
 
             // ECM doesn't consider a transitive chain of trust for install sources.
             // If this package hasn't been explicitly handled by this point
             // then it is exempt from ECM if the immediate parent is a trusted installer
-            return !isAllowlistedInstaller(installSource.getInstallingPackageName());
+            return !(trustPackagesInstalledViaNonAllowlistedInstallers()
+                    || isPackagePreinstalled(installingApplicationInfo)
+                    || isAllowlistedInstaller(installingPackageName));
         }
 
         private boolean isAllowlistedPackage(String packageName) {
@@ -311,17 +326,17 @@ public class EnhancedConfirmationService extends SystemService {
             return false;
         }
 
+        /**
+         * @return {@code true} if zero {@code <enhanced-confirmation-trusted-installer>} entries
+         * are defined in {@code frameworks/base/data/etc/enhanced-confirmation.xml}; in this case,
+         * we treat all installers as trusted.
+         */
         private boolean trustPackagesInstalledViaNonAllowlistedInstallers() {
-            return true; // TODO(b/327469700): Make this configurable
+            return mTrustedInstallerCertDigests.isEmpty();
         }
 
-        private boolean isPackagePreinstalled(@NonNull String packageName, @UserIdInt int userId) {
-            ApplicationInfo applicationInfo;
-            try {
-                applicationInfo = mPackageManager.getApplicationInfoAsUser(packageName, 0,
-                        UserHandle.of(userId));
-            } catch (NameNotFoundException e) {
-                Log.w(LOG_TAG, "Package not found: " + packageName);
+        private boolean isPackagePreinstalled(@Nullable ApplicationInfo applicationInfo) {
+            if (applicationInfo == null) {
                 return false;
             }
             return (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
@@ -363,6 +378,22 @@ public class EnhancedConfirmationService extends SystemService {
             }
             // TODO(b/310218979): Add role selections as protected settings
             return false;
+        }
+
+        @Nullable
+        private ApplicationInfo getApplicationInfoAsUser(@Nullable String packageName,
+                @UserIdInt int userId) {
+            if (packageName == null) {
+                Log.w(LOG_TAG, "The packageName should not be null.");
+                return null;
+            }
+            try {
+                return mPackageManager.getApplicationInfoAsUser(packageName, /* flags */ 0,
+                        UserHandle.of(userId));
+            } catch (NameNotFoundException e) {
+                Log.w(LOG_TAG, "Package not found: " + packageName, e);
+                return null;
+            }
         }
 
         private int getPackageUid(@NonNull String packageName, @UserIdInt int userId)
