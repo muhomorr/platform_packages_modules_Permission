@@ -56,11 +56,9 @@ private const val LOG_TAG = "PermissionTest30WithBluetooth"
 @RunWith(BedsteadJUnit4::class)
 @FlakyTest
 class PermissionTest30WithBluetooth : BaseUsePermissionTest() {
-    @ClassRule
-    @Rule
-    val sDeviceState: DeviceState = DeviceState()
     companion object {
         @get:ClassRule @JvmStatic val enableBluetooth = EnableBluetoothRule(true)
+        @ClassRule @Rule @JvmField val sDeviceState = DeviceState()
     }
 
     private val TEST_APP_AUTHORITY =
