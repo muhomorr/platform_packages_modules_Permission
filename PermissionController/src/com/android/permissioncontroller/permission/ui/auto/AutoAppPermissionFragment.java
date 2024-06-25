@@ -237,6 +237,8 @@ public class AutoAppPermissionFragment extends AutoSettingsFrameFragment
         });
 
         mDetailsPreference = new AutoTwoTargetPreference(requireContext());
+        // If the details are updated, setDetail will update the visibility
+        mDetailsPreference.setVisible(false);
         screen.addPreference(mDetailsPreference);
     }
 
@@ -474,6 +476,7 @@ public class AutoAppPermissionFragment extends AutoSettingsFrameFragment
         } else {
             mDetailsPreference.setSummary(detailResIds.getFirst());
         }
+        mDetailsPreference.setVisible(true);
     }
 
     /**
