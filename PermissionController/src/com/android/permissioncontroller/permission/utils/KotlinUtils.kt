@@ -284,16 +284,6 @@ object KotlinUtils {
         )
     }
 
-    /** Whether the safety label changes job should only be run when the device is idle. */
-    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE, codename = "UpsideDownCake")
-    fun runSafetyLabelChangesJobOnlyWhenDeviceIdle(): Boolean {
-        return DeviceConfig.getBoolean(
-            DeviceConfig.NAMESPACE_PRIVACY,
-            PROPERTY_SAFETY_LABEL_CHANGES_JOB_RUN_WHEN_IDLE,
-            true
-        )
-    }
-
     /**
      * Given a Map, and a List, determines which elements are in the list, but not the map, and vice
      * versa. Used primarily for determining which liveDatas are already being watched, and which

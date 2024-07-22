@@ -482,8 +482,7 @@ class SafetyLabelChangesJobService : JobService() {
     private suspend fun getNumberOfAppsWithDataSharingChanged(): Int {
         val appDataSharingUpdates =
             AppDataSharingUpdatesLiveData(PermissionControllerApplication.get())
-                .getInitializedValue()
-                ?: return 0
+                .getInitializedValue() ?: return 0
 
         return appDataSharingUpdates
             .map { appDataSharingUpdate ->
@@ -515,8 +514,7 @@ class SafetyLabelChangesJobService : JobService() {
             }
             ?.keys
             ?.filter { packageUser: Pair<String, UserHandle> -> packageUser.first == packageName }
-            ?.map { packageUser: Pair<String, UserHandle> -> packageUser.second }
-            ?: listOf()
+            ?.map { packageUser: Pair<String, UserHandle> -> packageUser.second } ?: listOf()
     }
 
     private fun AppDataSharingUpdate.containsLocationCategoryUpdate() =
@@ -652,9 +650,7 @@ class SafetyLabelChangesJobService : JobService() {
                             SAFETY_LABEL_CHANGES_DETECT_UPDATES_JOB_ID,
                             ComponentName(context, SafetyLabelChangesJobService::class.java)
                         )
-                        .setRequiresDeviceIdle(
-                            KotlinUtils.runSafetyLabelChangesJobOnlyWhenDeviceIdle()
-                        )
+                        .setRequiresDeviceIdle(true)
                         .build()
                 val result = jobScheduler.schedule(job)
                 if (result != JobScheduler.RESULT_SUCCESS) {
@@ -685,9 +681,7 @@ class SafetyLabelChangesJobService : JobService() {
                             SAFETY_LABEL_CHANGES_PERIODIC_NOTIFICATION_JOB_ID,
                             ComponentName(context, SafetyLabelChangesJobService::class.java)
                         )
-                        .setRequiresDeviceIdle(
-                            KotlinUtils.runSafetyLabelChangesJobOnlyWhenDeviceIdle()
-                        )
+                        .setRequiresDeviceIdle(true)
                         .setPeriodic(KotlinUtils.getSafetyLabelChangesJobIntervalMillis())
                         .setPersisted(true)
                         .build()
