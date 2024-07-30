@@ -195,7 +195,7 @@
     <string name="app_permission_button_deny" msgid="6016454069832050300">"Non consentire"</string>
     <string name="precise_image_description" msgid="6349638632303619872">"Posizione esatta"</string>
     <string name="approximate_image_description" msgid="938803699637069884">"Posizione approssimativa"</string>
-    <string name="app_permission_location_accuracy" msgid="7166912915040018669">"Posizione esatta"</string>
+    <string name="app_permission_location_accuracy" msgid="7166912915040018669">"Usa posizione esatta"</string>
     <string name="app_permission_location_accuracy_subtitle" msgid="2654077606404987210">"Quando la posizione esatta non è attiva, le app possono accedere alla tua posizione approssimativa"</string>
     <string name="app_permission_title" msgid="2090897901051370711">"Autorizzazione <xliff:g id="PERM">%1$s</xliff:g>"</string>
     <string name="app_permission_header" msgid="2951363137032603806">"Accesso a <xliff:g id="PERM">%1$s</xliff:g> per questa app"</string>
@@ -249,7 +249,7 @@
     <string name="app_permission_never_accessed_denied_summary" msgid="6596000497490905146">"Rifiutata/Accesso mai effettuato"</string>
     <string name="allowed_header" msgid="7769277978004790414">"Autorizzata"</string>
     <string name="allowed_always_header" msgid="6455903312589013545">"Autorizzazione sempre concessa"</string>
-    <string name="allowed_foreground_header" msgid="6845655788447833353">"Autorizzazione concessa solo durante l\'uso"</string>
+    <string name="allowed_foreground_header" msgid="6845655788447833353">"Autorizzazione concessa solo se in uso"</string>
     <string name="allowed_storage_scoped" msgid="5383645873719086975">"Autorizzate solo per contenuti multimediali"</string>
     <string name="allowed_storage_full" msgid="5356699280625693530">"Autorizzate per gestire tutti i file"</string>
     <string name="ask_header" msgid="2633816846459944376">"Chiedi ogni volta"</string>
