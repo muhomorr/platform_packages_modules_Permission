@@ -233,16 +233,16 @@ public class PermissionUsageFragment extends SettingsWithLargeHeader {
                         PERMISSION_USAGE_FRAGMENT_INTERACTION,
                         mSessionId,
                         PERMISSION_USAGE_FRAGMENT_INTERACTION__ACTION__SHOW_SYSTEM_CLICKED);
-                updateAllUI(mViewModel.updateShowSystem(true));
+                mViewModel.updateShowSystem(true);
                 break;
             case MENU_HIDE_SYSTEM:
-                updateAllUI(mViewModel.updateShowSystem(false));
+                mViewModel.updateShowSystem(false);
                 break;
             case MENU_SHOW_7_DAYS_DATA:
-                updateAllUI(mViewModel.updateShow7Days(KotlinUtils.INSTANCE.is7DayToggleEnabled()));
+                mViewModel.updateShow7Days(KotlinUtils.INSTANCE.is7DayToggleEnabled());
                 break;
             case MENU_SHOW_24_HOURS_DATA:
-                updateAllUI(mViewModel.updateShow7Days(false));
+                mViewModel.updateShow7Days(false);
                 break;
         }
         return super.onOptionsItemSelected(item);
