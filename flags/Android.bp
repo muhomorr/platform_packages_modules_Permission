@@ -35,7 +35,7 @@ java_aconfig_library {
         "test_com.android.permission",
     ],
     installable: false,
-    libs: ["framework-configinfrastructure"],
+    libs: ["framework-configinfrastructure.stubs.module_lib"],
     visibility: [
         "//packages/modules/Permission:__subpackages__",
     ],
